@@ -57,9 +57,9 @@ export default function Presentation({ children }: { children: React.ReactNode }
   }, []);
   const fullCollapse = useMemo(() => localStorage.getItem('fullPanelCollapse') === 'true', []);
 
-  return (
-    <DragDropWrapper className="relative flex w-full grow overflow-hidden bg-presentation">
-      <SidePanelProvider>
+    return (
+      <DragDropWrapper className="relative flex w-full grow overflow-hidden bg-splash">
+        <SidePanelProvider>
         <SidePanelGroup
           defaultLayout={defaultLayout}
           fullPanelCollapse={fullCollapse}

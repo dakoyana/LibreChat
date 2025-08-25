@@ -40,6 +40,7 @@
   --red-800: #991b1b;
   --red-900: #7f1d1d;
   --red-950: #450a0a;
+  --accent-red: #ff0000;
   --amber-50: #fffbeb;
   --amber-100: #fef3c7;
   --amber-200: #fde68a;
@@ -91,6 +92,7 @@ html {
   --surface-destructive: var(--red-700);
   --surface-destructive-hover: var(--red-800);
   --surface-chat: var(--white);
+  --background-splash: linear-gradient(135deg, #ffffff 0%, #ffe5e5 40%, #ff0000 100%);
   --border-light: var(--gray-200);
   --border-medium-alt: var(--gray-300);
   --border-medium: var(--gray-300);
@@ -151,6 +153,8 @@ html {
   --surface-destructive: var(--red-800);
   --surface-destructive-hover: var(--red-900);
   --surface-chat: var(--gray-700);
+  --accent-red: #cc0000;
+  --background-splash: linear-gradient(135deg, #000000 0%, #440000 40%, #ff0000 100%);
   --border-light: var(--gray-700);
   --border-medium-alt: var(--gray-600);
   --border-medium: var(--gray-600);
@@ -205,6 +209,10 @@ html {
   --border-medium: rgba(217, 217, 227, 0.15);
   --border-heavy: rgba(217, 217, 227, 0.2);
   --border-xheavy: rgba(217, 217, 227, 0.25);
+}
+
+.bg-splash {
+  background: var(--background-splash);
 }
 
 .text-token-text-primary {

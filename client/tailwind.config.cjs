@@ -1,4 +1,12 @@
 // const { fontFamily } = require('tailwindcss/defaultTheme');
+// Utility to apply opacity to CSS variable-based colors
+
+const withOpacityValue =
+  (variable) =>
+  ({ opacityValue }) =>
+    opacityValue === undefined
+      ? `rgb(var(${variable}))`
+      : `rgb(var(${variable}) / ${opacityValue})`;
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -113,7 +121,7 @@ module.exports = {
         'surface-destructive': 'var(--surface-destructive)',
         'surface-destructive-hover': 'var(--surface-destructive-hover)',
         'surface-chat': 'var(--surface-chat)',
-        'accent-red': 'var(--accent-red)',
+        'accent-red': withOpacityValue('--accent-red'),
         'border-light': 'var(--border-light)',
         'border-medium': 'var(--border-medium)',
         'border-medium-alt': 'var(--border-medium-alt)',

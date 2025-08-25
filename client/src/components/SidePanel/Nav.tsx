@@ -37,6 +37,10 @@ function NavContent({ links, isCollapsed, resize }: Omit<NavProps, 'defaultActiv
                         <Button
                           variant="ghost"
                           size="icon"
+                          className={cn(
+                            'text-text-secondary hover:text-accent-red',
+                            link.id === active ? 'text-accent-red' : '',
+                          )}
                           onClick={(e) => {
                             if (link.onClick) {
                               link.onClick(e);
@@ -47,7 +51,7 @@ function NavContent({ links, isCollapsed, resize }: Omit<NavProps, 'defaultActiv
                             resize && resize(25);
                           }}
                         >
-                          <link.icon className="h-4 w-4 text-text-secondary" />
+                          <link.icon className="h-4 w-4" />
                           <span className="sr-only">{localize(link.title)}</span>
                         </Button>
                       }
@@ -66,7 +70,7 @@ function NavContent({ links, isCollapsed, resize }: Omit<NavProps, 'defaultActiv
                             <Button
                               variant="outline"
                               size="sm"
-                              className="w-full justify-start bg-transparent text-text-secondary data-[state=open]:bg-surface-secondary data-[state=open]:text-text-primary"
+                              className="w-full justify-start bg-transparent text-text-secondary hover:text-accent-red data-[state=open]:bg-surface-secondary data-[state=open]:text-accent-red"
                               onClick={(e) => {
                                 if (link.onClick) {
                                   link.onClick(e);
@@ -80,7 +84,7 @@ function NavContent({ links, isCollapsed, resize }: Omit<NavProps, 'defaultActiv
                                 <span
                                   className={cn(
                                     'ml-auto opacity-100 transition-all duration-300 ease-in-out',
-                                    variant === 'default' ? 'text-text-primary' : '',
+                                    variant === 'default' ? 'text-accent-red' : '',
                                   )}
                                 >
                                   {link.label}

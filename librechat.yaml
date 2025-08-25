@@ -6,58 +6,10 @@ interface:
   modelSelect: true
   parameters: true  # <- lets users adjust reasoning/verbosity in UI
 
-modelSpecs:
-  enforce: true     # This forces ONLY these models to appear
-  prioritize: true   # Makes these the priority options
-  list:
-    # OpenAI Models
-    - name: "gpt-5"
-      label: "GPT-5"
-      default: true
-      preset:
-        endpoint: "openAI"
-        model: "gpt-5"
-        useResponsesApi: true   # <- add
-    - name: "gpt-5-mini"
-      label: "GPT-5 Mini"
-      preset:
-        endpoint: "openAI"
-        model: "gpt-5-mini"
-        useResponsesApi: true   # <- add
-    
-    # Anthropic Models
-    - name: "claude-sonnet"
-      label: "Claude Sonnet 4"
-      description: "Claude Sonnet 4"
-      iconURL: "anthropic"
-      preset:
-        endpoint: "anthropic"
-        model: "claude-sonnet-4-20250514"
-        modelLabel: "Claude Sonnet 4"
-    
-    - name: "claude-opus"
-      label: "Claude Opus 4.1"
-      description: "Claude Opus 4.1"
-      iconURL: "anthropic"
-      preset:
-        endpoint: "anthropic"
-        model: "claude-opus-4.1-20250805"
-        modelLabel: "Claude Opus 4.1"
-
-    - name: "claude-sonnet-3-7"
-      label: "Claude Sonnet 3.7"
-      description: "Claude Sonnet 3.7"
-      iconURL: "anthropic"
-      preset:
-        endpoint: "anthropic"
-        model: "claude-3.7-sonnet-202502242"
-        modelLabel: "Claude Sonnet 3.7"
-        temperature: 0.7
-
 # Configure agents to only use specific providers
 endpoints:
   agents:
     disableBuilder: false
     capabilities: ["execute_code", "file_search", "actions", "tools", "artifacts", "ocr", "chain", "web_search"]
     # Limit which providers agents can use
-    allowedProviders: ["openAI", "anthropic"]
+    allowedProviders: ["openAI", "anthropic", "google", "xai", "deepseek"]

@@ -6,33 +6,7 @@ interface:
     👋 Welcome to **SCL Agents Hub**, {{user.name}}!
     
     Context-aware SCL agents. They are team members, specialised to help push our projects forward. We develop new agents and kill the ones that suck.
-  endpointsMenu: false  # This hides the green dropdown completely!
-  modelSelect: true     # Required for agent builder to work
-  sidePanel: true       # Required for agent builder to work
 
 endpoints:
   agents:
-    disableBuilder: false
-    capabilities: ["execute_code", "file_search", "actions", "tools", "artifacts", "ocr", "chain", "web_search"]
-    allowedProviders: ["openAI", "anthropic", "google", "xAI", "Together", "OpenRouter"]
-    
-  # Define custom endpoints for the agent builder to access
-  custom:
-    - name: "xAI"
-      apiKey: "${XAI_API_KEY}"
-      baseURL: "https://api.x.ai/v1"
-      models:
-        fetch: true
-        
-    - name: "Together"
-      apiKey: "${TOGETHERAI_API_KEY}"  
-      baseURL: "https://api.together.xyz/v1"
-      models:
-        fetch: true
-        
-    - name: "OpenRouter"
-      apiKey: "${OPENROUTER_KEY}"
-      baseURL: "https://openrouter.ai/api/v1"  
-      models:
-        fetch: true
-      dropParams: ["stop"]
+    allowedProviders: ["openAI", "anthropic", "google"]

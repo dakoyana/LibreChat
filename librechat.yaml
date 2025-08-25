@@ -7,34 +7,7 @@ interface:
     
     Context-aware SCL agents. They are team members, specialised to help push our projects forward. We develop new agents and kill the ones that suck.
 
-# This is the key - control exactly what shows up
-modelSpecs:
-  enforce: false  # Don't enforce strict modelSpecs
-  prioritize: true
-  addedEndpoints: ["agents"]  # Only add these custom endpoints
-
 endpoints:
   agents:
     disableBuilder: false
     capabilities: ["execute_code", "file_search", "actions", "tools", "artifacts", "ocr", "chain", "web_search"]
-  
-  # Define your custom endpoints
-  custom:
-    - name: "xAI"
-      apiKey: "${XAI_API_KEY}"
-      baseURL: "https://api.x.ai/v1"
-      models:
-        fetch: true  # Gets ALL xAI models automatically
-      
-    - name: "Together"
-      apiKey: "${TOGETHERAI_API_KEY}"
-      baseURL: "https://api.together.xyz/v1"
-      models:
-        fetch: true  # Gets ALL Together.ai models automatically
-        
-    - name: "OpenRouter"  
-      apiKey: "${OPENROUTER_KEY}"
-      baseURL: "https://openrouter.ai/api/v1"
-      models:
-        fetch: true  # Gets ALL OpenRouter models automatically
-      dropParams: ["stop"]

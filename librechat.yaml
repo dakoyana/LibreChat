@@ -26,24 +26,22 @@ modelSpecs:
     
     # Anthropic Models
     - name: "claude-sonnet"
-      label: "Claude Sonnet"
+      label: "Claude Sonnet 4"
       description: "Claude Sonnet 4"
       iconURL: "anthropic"
       preset:
         endpoint: "anthropic"
         model: "claude-sonnet-4-20250514"
         modelLabel: "Claude Sonnet 4"
-        temperature: 0.7
     
     - name: "claude-opus"
-      label: "Claude Opus"
+      label: "Claude Opus 4.1"
       description: "Claude Opus 4.1"
       iconURL: "anthropic"
       preset:
         endpoint: "anthropic"
         model: "claude-opus-4.1-20250805"
         modelLabel: "Claude Opus 4.1"
-        temperature: 0.7
 
     - name: "claude-sonnet-3-7"
       label: "Claude Sonnet 3.7"
@@ -51,7 +49,7 @@ modelSpecs:
       iconURL: "anthropic"
       preset:
         endpoint: "anthropic"
-        model: "claude-3.7-sonnet-20241022"
+        model: "claude-3.7-sonnet-202502242"
         modelLabel: "Claude Sonnet 3.7"
         temperature: 0.7
 

@@ -1,5 +1,6 @@
-version: 1.0.0
-cache: false  # Disable all LibreChat caching
+version: 1.2.8
+cache: true
+fileStrategy: "firebase"
 
 interface:
   modelSelect: true

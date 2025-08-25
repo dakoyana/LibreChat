@@ -1,13 +1,49 @@
 version: 1.0.0
-cache: true
+cache: false
 
 interface:
-  customWelcome: |
-    👋 Welcome to **SCL Agents Hub**, {{user.name}}!
-    
-    Context-aware SCL agents. They are team members, specialised to help push our projects forward. We develop new agents and kill the ones that suck.
+  modelSelect: true   # show the endpoint/model menu
+  # (If you later want to force only your curated presets, you can set this to false and use modelSpecs.enforce)
+
+modelSpecs:
+  enforce: false      # you're not locking to presets
+  prioritize: true
+  # IMPORTANT: only built-in keys allowed here; custom names won't work
+  addedEndpoints: ["openAI", "anthropic", "google"]
 
 endpoints:
   agents:
     disableBuilder: false
-    capabilities: ["execute_code", "file_search", "actions", "tools", "artifacts", "ocr", "chain", "web_search"]
+    allowedProviders:    # restrict Agent builder’s provider menu
+      - openAI
+      - anthropic
+      - google
+      - xai             # these must match your custom endpoint names below
+      - together.ai
+      - OpenRouter
+    capabilities: ["execute_code","file_search","actions","tools","artifacts","ocr","chain","web_search"]
+
+  custom:
+    - name: "xai"
+      apiKey: "${XAI_API_KEY}"
+      baseURL: "https://api.x.ai/v1"
+      models:
+        # CURATE: set fetch to false and list explicitly to avoid a huge menu
+        fetch: false
+        default: ["grok-beta"]   # put the exact xAI chat model ids you want
+
+    - name: "together.ai"
+      apiKey: "${TOGETHERAI_API_KEY}"
+      baseURL: "https://api.together.xyz/v1"
+      models:
+        fetch: false
+        default: ["meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo","Qwen/Qwen2.5-72B-Instruct"]
+
+    - name: "OpenRouter"
+      apiKey: "${OPENROUTER_KEY}"
+      baseURL: "https://openrouter.ai/api/v1"
+      models:
+        fetch: false
+        default: ["anthropic/claude-3.7-sonnet","google/gemini-1.5-pro","openai/gpt-4o"]
+      # Note: dropping "stop" is usually unnecessary now
+      # dropParams: ["stop"]

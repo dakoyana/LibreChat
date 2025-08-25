@@ -7,7 +7,7 @@ import { TooltipAnchor, Button, NewChatIcon, useMediaQuery } from '@librechat/cl
 import { PermissionTypes, Permissions, QueryKeys, Constants } from 'librechat-data-provider';
 import type t from 'librechat-data-provider';
 import type { ContextType } from '~/common';
-import { useGetEndpointsQuery, useGetAgentCategoriesQuery } from '~/data-provider';
+import { useGetEndpointsQuery, useGetAgentCategoriesQuery, useGetStartupConfig } from '~/data-provider';
 import { useDocumentTitle, useHasAccess, useLocalize } from '~/hooks';
 import MarketplaceAdminSettings from './MarketplaceAdminSettings';
 import { SidePanelProvider, useChatContext } from '~/Providers';
@@ -64,7 +64,10 @@ const AgentMarketplace: React.FC<AgentMarketplaceProps> = ({ className = '' }) =
   const [selectedAgent, setSelectedAgent] = useState<t.Agent | null>(null);
 
   // Set page title
-  useDocumentTitle(`${localize('com_agents_marketplace')} | LibreChat`);
+  const { data: startupConfig } = useGetStartupConfig();
+  useDocumentTitle(
+    `${localize('com_agents_marketplace')} | ${startupConfig?.appTitle ?? 'LibreChat'}`,
+  );
 
   // Ensure right sidebar is always visible in marketplace
   useEffect(() => {

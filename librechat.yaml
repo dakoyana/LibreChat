@@ -8,7 +8,7 @@ modelSpecs:
   enforce: false
   prioritize: true
   # IMPORTANT: only core keys are valid here
-  addedEndpoints: ["openAI", "anthropic", "google"]
+  addedEndpoints: ["agents"]
 
 endpoints:
   agents:
@@ -22,32 +22,3 @@ endpoints:
       - OpenRouter
     capabilities: ["execute_code","file_search","actions","tools","artifacts","ocr","chain","web_search"]
 
-  custom:
-    - name: "xai"
-      label: "xAI"
-      apiKey: "${XAI_API_KEY}"
-      baseURL: "https://api.x.ai/v1"
-      models:
-        fetch: false
-        # Use the exact id your account has access to (examples below)
-        default: ["grok-2"]
-
-    - name: "together.ai"
-      label: "Together AI"
-      apiKey: "${TOGETHERAI_API_KEY}"
-      baseURL: "https://api.together.xyz/v1"
-      models:
-        fetch: false
-        default:
-          - "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"
-          - "Qwen/Qwen2.5-72B-Instruct"
-
-    - name: "OpenRouter"
-      apiKey: "${OPENROUTER_KEY}"
-      baseURL: "https://openrouter.ai/api/v1"
-      models:
-        fetch: false
-        default:
-          - "openai/gpt-4o"
-          - "anthropic/claude-3.7-sonnet"
-          - "google/gemini-2.5-pro"

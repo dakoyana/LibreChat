@@ -228,6 +228,14 @@ html {
   color: var(--text-tertiary);
 }
 
+a {
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: rgb(var(--accent-red));
+}
+
 .icon-xs {
   stroke-width: 1.5;
   height: 0.75rem;

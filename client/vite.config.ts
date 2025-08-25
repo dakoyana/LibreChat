@@ -52,8 +52,8 @@ export default defineConfig(({ command }) => ({
       },
       includeAssets: [],
       manifest: {
-        name: 'LibreChat',
-        short_name: 'LibreChat',
+        name: 'SCL Agents Hub',
+        short_name: 'SCL Agents Hub',
         start_url: '/',
         display: 'standalone',
         background_color: '#000000',

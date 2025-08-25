@@ -2,7 +2,7 @@ version: 1.0.0
 cache: true
 
 interface:
-  modelSelect: true   # keep the endpoint/model picker visible
+  modelSelect: false   # keep the endpoint/model picker visible
 
 modelSpecs:
   enforce: false

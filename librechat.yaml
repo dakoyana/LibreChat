@@ -2,38 +2,27 @@ version: 1.0.0
 cache: false  # Disable all LibreChat caching
 
 interface:
-  modelSelect: true  # Required for modelSpecs to work properly
-  customWelcome: |
-    👋 Welcome to **SCL Agents Hub**, {{user.name}}!
-    
-    Context-aware SCL agents. They are team members, specialised to help push our projects forward. We develop new agents and kill the ones that suck.
-
+  modelSelect: true
+  parameters: true  # <- lets users adjust reasoning/verbosity in UI
 
 modelSpecs:
-  enforce: true      # This forces ONLY these models to appear
+  enforce: true     # This forces ONLY these models to appear
   prioritize: true   # Makes these the priority options
   list:
     # OpenAI Models
     - name: "gpt-5"
       label: "GPT-5"
-      description: "Most advanced OpenAI model"
-      iconURL: "openAI"  # Uses OpenAI icon
-      default: true      # Makes this the default selection
+      default: true
       preset:
         endpoint: "openAI"
         model: "gpt-5"
-        modelLabel: "GPT-5"
-        temperature: 0.7
-    
+        useResponsesApi: true   # <- add
     - name: "gpt-5-mini"
       label: "GPT-5 Mini"
-      description: "Efficient GPT-5 variant"
-      iconURL: "openAI"
       preset:
         endpoint: "openAI"
         model: "gpt-5-mini"
-        modelLabel: "GPT-5 Mini"
-        temperature: 0.7
+        useResponsesApi: true   # <- add
     
     # Anthropic Models
     - name: "claude-sonnet"

@@ -11,7 +11,7 @@ interface:
 modelSpecs:
   enforce: false  # Don't enforce strict modelSpecs
   prioritize: true
-  addedEndpoints: ["xAI", "Together", "OpenRouter"]  # Only add these custom endpoints
+  addedEndpoints: ["agents"]  # Only add these custom endpoints
 
 endpoints:
   agents:

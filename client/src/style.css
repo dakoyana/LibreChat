@@ -40,7 +40,7 @@
   --red-800: #991b1b;
   --red-900: #7f1d1d;
   --red-950: #450a0a;
-  --accent-red: #ff0000;
+  --accent-red: 255 0 0;
   --amber-50: #fffbeb;
   --amber-100: #fef3c7;
   --amber-200: #fde68a;
@@ -153,7 +153,7 @@ html {
   --surface-destructive: var(--red-800);
   --surface-destructive-hover: var(--red-900);
   --surface-chat: var(--gray-700);
-  --accent-red: #cc0000;
+  --accent-red: 204 0 0;
   --background-splash: linear-gradient(135deg, #000000 0%, #440000 40%, #ff0000 100%);
   --border-light: var(--gray-700);
   --border-medium-alt: var(--gray-600);

@@ -1,4 +1,12 @@
 // const { fontFamily } = require('tailwindcss/defaultTheme');
+// Utility to apply opacity to CSS variable-based colors
+
+const withOpacityValue =
+  (variable) =>
+  ({ opacityValue }) =>
+    opacityValue === undefined
+      ? `rgb(var(${variable}))`
+      : `rgb(var(${variable}) / ${opacityValue})`;
 
 const withOpacityValue = (variable) => ({ opacityValue }) =>
   opacityValue === undefined

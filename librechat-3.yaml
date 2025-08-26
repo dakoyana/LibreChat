@@ -1,0 +1,20 @@
+version: 1.2.8
+cache: true
+fileStrategy: "firebase"
+
+  customWelcome: |
+    👋 Welcome to **SCL Agents Hub**, {{user.name}}!
+
+    Context-aware SCL agents. They are specialised to help push our projects forward. We develop new agents and kill the ones that suck.
+
+interface:
+  modelSelect: true
+  parameters: true  # <- lets users adjust reasoning/verbosity in UI
+
+# Configure agents to only use specific providers
+endpoints:
+  agents:
+    disableBuilder: false
+    capabilities: ["execute_code", "file_search", "actions", "tools", "artifacts", "ocr", "chain", "web_search"]
+    # Limit which providers agents can use
+    allowedProviders: ["openAI", "anthropic", "google", "xai", "deepseek"]

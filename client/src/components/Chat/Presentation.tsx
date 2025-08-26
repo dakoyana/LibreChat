@@ -51,11 +51,13 @@ export default function Presentation({ children }: { children: React.ReactNode }
     const resizableLayout = localStorage.getItem('react-resizable-panels:layout');
     return typeof resizableLayout === 'string' ? JSON.parse(resizableLayout) : undefined;
   }, []);
-  const defaultCollapsed = useMemo(() => {
-    const collapsedPanels = localStorage.getItem('react-resizable-panels:collapsed');
-    return typeof collapsedPanels === 'string' ? JSON.parse(collapsedPanels) : true;
+  const defaultCollapsed = true;
+  const fullCollapse = true;
+
+  useEffect(() => {
+    localStorage.setItem('react-resizable-panels:collapsed', 'true');
+    localStorage.setItem('fullPanelCollapse', 'true');
   }, []);
-  const fullCollapse = useMemo(() => localStorage.getItem('fullPanelCollapse') === 'true', []);
 
   return (
     <DragDropWrapper className="relative flex w-full grow overflow-hidden bg-presentation">

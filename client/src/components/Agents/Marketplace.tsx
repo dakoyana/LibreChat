@@ -42,7 +42,7 @@ const AgentMarketplace: React.FC<AgentMarketplaceProps> = ({ className = '' }) =
 
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
   const { navVisible, setNavVisible } = useOutletContext<ContextType>();
-  const [hideSidePanel, setHideSidePanel] = useRecoilState(store.hideSidePanel);
+  const [, setHideSidePanel] = useRecoilState(store.hideSidePanel);
 
   // Get URL parameters
   const searchQuery = searchParams.get('q') || '';
@@ -66,14 +66,16 @@ const AgentMarketplace: React.FC<AgentMarketplaceProps> = ({ className = '' }) =
   // Set page title
   useDocumentTitle(`${localize('com_agents_marketplace')} | LibreChat`);
 
-  // Ensure right sidebar is always visible in marketplace
+  // Ensure navigation and builder sidebars start collapsed in marketplace
   useEffect(() => {
     setHideSidePanel(false);
+    setNavVisible(false);
 
-    // Also try to force expand via localStorage
     localStorage.setItem('hideSidePanel', 'false');
-    localStorage.setItem('fullPanelCollapse', 'false');
-  }, [setHideSidePanel, hideSidePanel]);
+    localStorage.setItem('fullPanelCollapse', 'true');
+    localStorage.setItem('react-resizable-panels:collapsed', 'true');
+    localStorage.setItem('navVisible', JSON.stringify(false));
+  }, [setHideSidePanel, setNavVisible]);
 
   // Ensure endpoints config is loaded first (required for agent queries)
   useGetEndpointsQuery();

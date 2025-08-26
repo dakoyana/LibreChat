@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
+import { useSetRecoilState } from 'recoil';
 import type { ContextType } from '~/common';
 import {
   useSearchEnabled,
@@ -20,15 +21,21 @@ import { TermsAndConditionsModal } from '~/components/ui';
 import { Nav, MobileNav } from '~/components/Nav';
 import { useHealthCheck } from '~/data-provider';
 import { Banner } from '~/components/Banners';
+import store from '~/store';
 
 export default function Root() {
   const [showTerms, setShowTerms] = useState(false);
   const [bannerHeight, setBannerHeight] = useState(0);
   const [navVisible, setNavVisible] = useState(false);
+  const setHideSidePanel = useSetRecoilState(store.hideSidePanel);
 
   useEffect(() => {
     localStorage.setItem('navVisible', JSON.stringify(false));
-  }, []);
+    localStorage.setItem('react-resizable-panels:collapsed', 'true');
+    localStorage.setItem('fullPanelCollapse', 'true');
+    localStorage.setItem('hideSidePanel', 'false');
+    setHideSidePanel(false);
+  }, [setHideSidePanel]);
 
   const { isAuthenticated, logout } = useAuthContext();
 

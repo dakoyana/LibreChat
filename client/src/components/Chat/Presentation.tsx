@@ -51,12 +51,22 @@ export default function Presentation({ children }: { children: React.ReactNode }
     const resizableLayout = localStorage.getItem('react-resizable-panels:layout');
     return typeof resizableLayout === 'string' ? JSON.parse(resizableLayout) : undefined;
   }, []);
-  const defaultCollapsed = true;
-  const fullCollapse = true;
+  const defaultCollapsed = useMemo(
+    () => localStorage.getItem('react-resizable-panels:collapsed') === 'true',
+    [],
+  );
+  const fullCollapse = useMemo(
+    () => localStorage.getItem('fullPanelCollapse') === 'true',
+    [],
+  );
 
   useEffect(() => {
-    localStorage.setItem('react-resizable-panels:collapsed', 'true');
-    localStorage.setItem('fullPanelCollapse', 'true');
+    if (localStorage.getItem('react-resizable-panels:collapsed') === null) {
+      localStorage.setItem('react-resizable-panels:collapsed', 'true');
+    }
+    if (localStorage.getItem('fullPanelCollapse') === null) {
+      localStorage.setItem('fullPanelCollapse', 'true');
+    }
   }, []);
 
   return (

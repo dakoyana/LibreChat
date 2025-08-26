@@ -197,7 +197,7 @@ function ToolSelectDialog({
           className="relative max-h-[90vh] w-full transform overflow-hidden overflow-y-auto rounded-lg bg-surface-secondary text-left shadow-xl transition-all max-sm:h-full sm:mx-7 sm:my-8 sm:max-w-2xl lg:max-w-5xl xl:max-w-7xl"
           style={{ minHeight: '610px' }}
         >
-          <div className="flex items-center justify-between border-b-[1px] border-border-medium px-4 pb-4 pt-5 sm:p-6">
+          <div className="flex items-center justify-between border-b-[1px] border-border-neon px-4 pb-4 pt-5 sm:p-6">
             <div className="flex items-center">
               <div className="text-center sm:text-left">
                 <DialogTitle className="text-lg font-medium leading-6 text-text-primary">
@@ -252,7 +252,7 @@ function ToolSelectDialog({
                   value={searchValue}
                   onChange={handleSearch}
                   placeholder={localize('com_nav_tool_search')}
-                  className="w-64 rounded border border-border-medium bg-transparent px-2 py-1 text-text-primary focus:outline-none"
+                  className="w-64 rounded border border-border-neon neon-border bg-transparent px-2 py-1 text-text-primary focus:outline-none"
                 />
               </div>
               <div

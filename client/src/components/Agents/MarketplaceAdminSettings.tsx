@@ -147,12 +147,12 @@ const MarketplaceAdminSettings = () => {
       <OGDialogTrigger asChild>
         <Button
           variant="outline"
-          className="relative h-12 rounded-xl border-border-medium font-medium"
+          className="relative h-12 rounded-xl border border-border-neon neon-border font-medium"
         >
           <ShieldEllipsis className="cursor-pointer" aria-hidden="true" />
         </Button>
       </OGDialogTrigger>
-      <OGDialogContent className="w-11/12 max-w-md border-border-light bg-surface-primary text-text-primary">
+      <OGDialogContent className="w-11/12 max-w-md border border-border-neon neon-border bg-surface-primary text-text-primary">
         <OGDialogTitle>{`${localize('com_ui_admin_settings')} - ${localize(
           'com_ui_marketplace',
         )}`}</OGDialogTitle>
@@ -166,7 +166,7 @@ const MarketplaceAdminSettings = () => {
               isOpen={isRoleMenuOpen}
               setIsOpen={setIsRoleMenuOpen}
               trigger={
-                <Ariakit.MenuButton className="inline-flex w-1/4 items-center justify-center rounded-lg border border-border-light bg-transparent px-2 py-1 text-text-primary transition-all ease-in-out hover:bg-surface-tertiary">
+                <Ariakit.MenuButton className="inline-flex w-1/4 items-center justify-center rounded-lg border border-border-neon neon-border bg-transparent px-2 py-1 text-text-primary transition-all ease-in-out hover:bg-surface-tertiary">
                   {selectedRole}
                 </Ariakit.MenuButton>
               }

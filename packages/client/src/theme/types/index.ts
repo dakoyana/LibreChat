@@ -43,6 +43,7 @@ export interface IThemeRGB {
   'rgb-border-medium-alt'?: string;
   'rgb-border-heavy'?: string;
   'rgb-border-xheavy'?: string;
+  'rgb-border-neon'?: string;
 
   // Brand colors
   'rgb-brand-purple'?: string;
@@ -104,6 +105,7 @@ export interface IThemeVariables {
   '--border-medium-alt': string;
   '--border-heavy': string;
   '--border-xheavy': string;
+  '--border-neon': string;
   '--brand-purple': string;
   '--presentation': string;
 
@@ -161,6 +163,7 @@ export interface IThemeColors {
   'border-medium-alt'?: string;
   'border-heavy'?: string;
   'border-xheavy'?: string;
+  'border-neon'?: string;
   'brand-purple'?: string;
   presentation?: string;
 

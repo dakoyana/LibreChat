@@ -98,6 +98,7 @@ html {
   --border-medium: var(--gray-300);
   --border-heavy: var(--gray-400);
   --border-xheavy: var(--gray-500);
+  --border-neon: #ff0050;
   /* These are test styles */
 
   --background: 0 0% 100%;
@@ -160,6 +161,7 @@ html {
   --border-medium: var(--gray-600);
   --border-heavy: var(--gray-500);
   --border-xheavy: var(--gray-400);
+  --border-neon: #ff0050;
   /* These are test styles */
 
   --background: 0 0% 7%;
@@ -197,6 +199,7 @@ html {
   --border-medium: rgba(0, 0, 0, 0.15);
   --border-heavy: rgba(0, 0, 0, 0.2);
   --border-xheavy: rgba(0, 0, 0, 0.25);
+  --border-neon: #ff0050;
 }
 .gizmo.dark {
   --text-primary: var(--gray-100);
@@ -209,6 +212,7 @@ html {
   --border-medium: rgba(217, 217, 227, 0.15);
   --border-heavy: rgba(217, 217, 227, 0.2);
   --border-xheavy: rgba(217, 217, 227, 0.25);
+  --border-neon: #ff0050;
 }
 
 .bg-splash {
@@ -303,6 +307,16 @@ a:hover {
 .border-token-surface-tertiary {
   border-color: #ececf1;
   border-color: var(--surface-tertiary);
+}
+
+.neon-border {
+  border-color: var(--border-neon);
+  box-shadow: 0 0 5px var(--border-neon);
+}
+
+.dark .neon-border {
+  border-color: var(--border-neon);
+  box-shadow: 0 0 5px var(--border-neon);
 }
 
 .bg-token-surface-secondary {

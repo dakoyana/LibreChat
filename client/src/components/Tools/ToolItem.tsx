@@ -28,7 +28,7 @@ function ToolItem({ tool, onAddTool, onRemoveTool, isInstalled = false }: ToolIt
   const icon = (tool as AgentToolType).metadata?.icon || (tool as TPlugin).icon;
 
   return (
-    <div className="flex flex-col gap-4 rounded border border-border-medium bg-transparent p-6">
+    <div className="flex flex-col gap-4 rounded border border-border-neon neon-border bg-transparent p-6">
       <div className="flex gap-4">
         <div className="h-[70px] w-[70px] shrink-0">
           <div className="relative h-full w-full">
@@ -39,7 +39,7 @@ function ToolItem({ tool, onAddTool, onRemoveTool, isInstalled = false }: ToolIt
                 className="h-full w-full rounded-[5px] bg-white"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center rounded-[5px] border border-border-medium bg-transparent">
+              <div className="flex h-full w-full items-center justify-center rounded-[5px] border border-border-neon neon-border bg-transparent">
                 <Wrench className="h-8 w-8 text-text-secondary" />
               </div>
             )}

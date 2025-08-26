@@ -45,6 +45,7 @@ export const defaultTheme: IThemeRGB = {
   'rgb-border-medium-alt': '205 205 205', // #cdcdcd (gray-300)
   'rgb-border-heavy': '153 150 150', // #999696 (gray-400)
   'rgb-border-xheavy': '89 89 89', // #595959 (gray-500)
+  'rgb-border-neon': '255 0 80', // neon red
 
   // Brand colors
   'rgb-brand-purple': '171 104 255', // #ab68ff

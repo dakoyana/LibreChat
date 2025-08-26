@@ -18,13 +18,13 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, onClick, className = '' })
 
   return (
     <div
-      className={cn(
-        'group relative h-40 overflow-hidden rounded-xl border border-border-light',
-        'cursor-pointer shadow-sm transition-all duration-200 hover:border-border-medium hover:shadow-lg',
-        'bg-surface-tertiary hover:bg-surface-hover',
-        'space-y-3 p-4',
-        className,
-      )}
+        className={cn(
+          'group relative h-40 overflow-hidden rounded-xl border border-border-neon neon-border',
+          'cursor-pointer shadow-sm transition-all duration-200 hover:border-border-neon hover:shadow-lg',
+          'bg-surface-tertiary hover:bg-surface-hover',
+          'space-y-3 p-4',
+          className,
+        )}
       onClick={onClick}
       aria-label={localize('com_agents_agent_card_label', {
         name: agent.name,
@@ -48,7 +48,7 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, onClick, className = '' })
 
           {/* Category tag */}
           {agent.category && (
-            <div className="inline-flex items-center rounded-md border-border-xheavy bg-surface-active-alt px-2 py-1 text-xs font-medium">
+              <div className="inline-flex items-center rounded-md border border-border-neon neon-border bg-surface-active-alt px-2 py-1 text-xs font-medium">
               <Label className="line-clamp-1 font-normal">
                 {agent.category.charAt(0).toUpperCase() + agent.category.slice(1)}
               </Label>

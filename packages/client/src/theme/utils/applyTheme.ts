@@ -57,6 +57,7 @@ function mapTheme(rgb: IThemeRGB): Partial<IThemeVariables> {
     'rgb-border-medium-alt': '--border-medium-alt',
     'rgb-border-heavy': '--border-heavy',
     'rgb-border-xheavy': '--border-xheavy',
+    'rgb-border-neon': '--border-neon',
     'rgb-brand-purple': '--brand-purple',
     'rgb-presentation': '--presentation',
 

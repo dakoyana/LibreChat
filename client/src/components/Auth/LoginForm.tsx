@@ -67,8 +67,8 @@ const LoginForm: React.FC<TLoginFormProps> = ({ onSubmit, startupConfig, error, 
 
   return (
     <>
-      {showResendLink && (
-        <div className="mt-2 rounded-md border border-green-500 bg-green-500/10 px-3 py-2 text-sm text-gray-600 dark:text-gray-200">
+        {showResendLink && (
+          <div className="mt-2 rounded-md border border-border-neon neon-border bg-border-neon/10 px-3 py-2 text-sm text-gray-600 dark:text-gray-200">
           {localize('com_auth_email_verification_resend_prompt')}
           <button
             type="button"
@@ -102,7 +102,7 @@ const LoginForm: React.FC<TLoginFormProps> = ({ onSubmit, startupConfig, error, 
                 },
               })}
               aria-invalid={!!errors.email}
-              className="webkit-dark-styles transition-color peer w-full rounded-2xl border border-border-light bg-surface-primary px-3.5 pb-2.5 pt-3 text-text-primary duration-200 focus:border-green-500 focus:outline-none"
+                className="webkit-dark-styles transition-color peer w-full rounded-2xl border border-border-neon neon-border bg-surface-primary px-3.5 pb-2.5 pt-3 text-text-primary duration-200 focus:border-border-neon focus:outline-none"
               placeholder=" "
             />
             <label
@@ -129,7 +129,7 @@ const LoginForm: React.FC<TLoginFormProps> = ({ onSubmit, startupConfig, error, 
                 maxLength: { value: 128, message: localize('com_auth_password_max_length') },
               })}
               aria-invalid={!!errors.password}
-              className="webkit-dark-styles transition-color peer w-full rounded-2xl border border-border-light bg-surface-primary px-3.5 pb-2.5 pt-3 text-text-primary duration-200 focus:border-green-500 focus:outline-none"
+                className="webkit-dark-styles transition-color peer w-full rounded-2xl border border-border-neon neon-border bg-surface-primary px-3.5 pb-2.5 pt-3 text-text-primary duration-200 focus:border-border-neon focus:outline-none"
               placeholder=" "
             />
             <label

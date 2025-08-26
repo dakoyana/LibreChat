@@ -45,6 +45,7 @@ export const darkTheme: IThemeRGB = {
   'rgb-border-medium-alt': '66 66 66', // #424242 (gray-600)
   'rgb-border-heavy': '89 89 89', // #595959 (gray-500)
   'rgb-border-xheavy': '153 150 150', // #999696 (gray-400)
+  'rgb-border-neon': '255 0 80', // neon red
 
   // Brand colors
   'rgb-brand-purple': '171 104 255', // #ab68ff

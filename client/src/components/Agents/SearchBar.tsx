@@ -67,13 +67,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ value, onSearch, className = '' }
       <label htmlFor="agent-search" className="sr-only">
         {localize('com_agents_search_instructions')}
       </label>
-      <Input
-        id="agent-search"
-        type="text"
-        value={searchTerm}
-        onChange={handleChange}
-        placeholder={localize('com_agents_search_placeholder')}
-        className="h-12 rounded-xl border-border-medium bg-transparent pl-12 pr-12 text-lg text-text-primary shadow-md transition-[border-color,box-shadow] duration-200 placeholder:text-text-secondary focus:border-border-heavy focus:shadow-lg focus:ring-0"
+        <Input
+          id="agent-search"
+          type="text"
+          value={searchTerm}
+          onChange={handleChange}
+          placeholder={localize('com_agents_search_placeholder')}
+          className="h-12 rounded-xl border border-border-neon neon-border bg-transparent pl-12 pr-12 text-lg text-text-primary shadow-md transition-[border-color,box-shadow] duration-200 placeholder:text-text-secondary focus:border-border-neon focus:shadow-lg focus:ring-0"
         aria-label={localize('com_agents_search_aria')}
         aria-describedby="search-instructions search-results-count"
         autoComplete="off"

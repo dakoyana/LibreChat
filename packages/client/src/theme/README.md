@@ -154,6 +154,10 @@ function MyComponent() {
 - `border-border-medium` - Medium border
 - `border-border-heavy` - Heavy border
 - `border-border-xheavy` - Extra heavy border
+- `border-border-neon` - Neon red border
+
+### Utility Classes
+- `.neon-border` - Applies a neon red border with a subtle glow
 
 ### Other Colors
 - `bg-brand-purple` - Brand purple color

@@ -99,6 +99,10 @@ html {
   --border-heavy: var(--gray-400);
   --border-xheavy: var(--gray-500);
   --border-neon: #ff0050;
+  /* === SCL Accent Tokens (FF0000) === */
+  --scl-accent: 255, 0, 0;
+  --scl-glow: 0 0 .25rem rgba(var(--scl-accent), .28),
+              0 0 .6rem rgba(var(--scl-accent), .18);
   /* These are test styles */
 
   --background: 0 0% 100%;
@@ -187,6 +191,30 @@ html {
   --chart-4: 280 65% 60%;
   --chart-5: 340 75% 55%;
   --switch-unchecked: 0 0% 40%;
+  --scl-glow: 0 0 .6rem rgba(var(--scl-accent), .45),
+              0 0 1.2rem rgba(var(--scl-accent), .30);
+}
+
+/* Neon utility – drop-in on any input/textarea wrapper or the element itself */
+[data-scl-glow],
+.scl-neon {
+  --ring: 0 100% 50%;
+  --tw-ring-color: hsl(var(--ring));
+
+  border-color: rgba(var(--scl-accent), .50) !important;
+  box-shadow:
+    0 0 0 1px rgba(var(--scl-accent), .45) inset,
+    var(--scl-glow);
+}
+
+[data-scl-glow]:focus,
+[data-scl-glow]:focus-within,
+.scl-neon:focus,
+.scl-neon:focus-within {
+  box-shadow:
+    0 0 0 1px rgba(var(--scl-accent), .65) inset,
+    var(--scl-glow),
+    0 0 0 3px rgba(var(--scl-accent), .15);
 }
 .gizmo {
   --text-primary: var(--gizmo-gray-950);

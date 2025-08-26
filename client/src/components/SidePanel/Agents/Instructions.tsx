@@ -11,7 +11,7 @@ import { useLocalize } from '~/hooks';
 
 const inputClass = cn(
   defaultTextProps,
-  'flex w-full px-3 py-2 border-border-light bg-surface-secondary focus-visible:ring-2 focus-visible:ring-ring-primary',
+  'flex w-full px-3 py-2 bg-surface-secondary focus-visible:ring-2 focus-visible:ring-ring-primary',
   removeFocusOutlines,
 );
 
@@ -82,6 +82,7 @@ export default function Instructions() {
             <textarea
               {...field}
               value={field.value ?? ''}
+              data-scl-glow
               className={cn(inputClass, 'min-h-[100px] resize-y')}
               id="instructions"
               placeholder={localize('com_agents_instructions_placeholder')}

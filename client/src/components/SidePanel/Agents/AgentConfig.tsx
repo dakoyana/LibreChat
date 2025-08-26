@@ -33,7 +33,7 @@ import { Panel } from '~/common';
 const labelClass = 'mb-2 text-token-text-primary block font-medium';
 const inputClass = cn(
   defaultTextProps,
-  'flex w-full px-3 py-2 border-border-light bg-surface-secondary focus-visible:ring-2 focus-visible:ring-ring-primary',
+  'flex w-full px-3 py-2 bg-surface-secondary focus-visible:ring-2 focus-visible:ring-ring-primary',
   removeFocusOutlines,
 );
 
@@ -211,6 +211,7 @@ export default function AgentConfig({ createMutation }: Pick<AgentPanelProps, 'c
                   {...field}
                   value={field.value ?? ''}
                   maxLength={256}
+                  data-scl-glow
                   className={inputClass}
                   id="name"
                   type="text"
@@ -251,6 +252,7 @@ export default function AgentConfig({ createMutation }: Pick<AgentPanelProps, 'c
                 {...field}
                 value={field.value ?? ''}
                 maxLength={512}
+                data-scl-glow
                 className={inputClass}
                 id="description"
                 type="text"

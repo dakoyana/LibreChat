@@ -24,10 +24,11 @@ import { Banner } from '~/components/Banners';
 export default function Root() {
   const [showTerms, setShowTerms] = useState(false);
   const [bannerHeight, setBannerHeight] = useState(0);
-  const [navVisible, setNavVisible] = useState(() => {
-    const savedNavVisible = localStorage.getItem('navVisible');
-    return savedNavVisible !== null ? JSON.parse(savedNavVisible) : true;
-  });
+  const [navVisible, setNavVisible] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('navVisible', JSON.stringify(false));
+  }, []);
 
   const { isAuthenticated, logout } = useAuthContext();
 

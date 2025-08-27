@@ -23,6 +23,7 @@ COPY api/package*.json ./api/
 # Install all dependencies for every build
 FROM base-min AS base
 WORKDIR /app
+RUN test -f package-lock.json || (echo "Missing lockfile" && exit 1)
 RUN npm ci
 
 # Build `data-provider` package

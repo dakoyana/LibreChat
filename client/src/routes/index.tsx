@@ -112,7 +112,7 @@ export const router = createBrowserRouter([
           },
           {
             path: 'agents/:category',
-            element: <AgentMarketplace />,
+            element: <Navigate to="/agents" replace />, 
           },
         ],
       },

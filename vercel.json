@@ -1,0 +1,22 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/api/:path*",  "destination": "https://librechat-production-dce3.up.railway.app/api/:path*" },
+    { "source": "/auth/:path*", "destination": "https://librechat-production-dce3.up.railway.app/auth/:path*" }
+  ],
+  "headers": [
+    {
+      "source": "/api/:path*",
+      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+    }
+  ],
+  "redirects": [],
+  "routes": [],
+  "cleanUrls": true
+}
+
+{ "rewrites": [
+  { "source": "/api/:path*",  "destination": "https://librechat-production-dce3.up.railway.app/api/:path*" },
+  { "source": "/auth/:path*", "destination": "https://librechat-production-dce3.up.railway.app/auth/:path*" },
+  { "source": "/((?!api|auth|assets|static|_next).*)", "destination": "/" }
+]}

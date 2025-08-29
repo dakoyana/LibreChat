@@ -1,7 +1,7 @@
 {
   "version": 2,
   "installCommand": "npm ci --no-audit --prefer-offline",
-  "buildCommand": "NODE_OPTIONS=\"--max-old-space-size=2048\" npm run frontend:ci",
+  "buildCommand": "NODE_OPTIONS=\"--max-old-space-size=2048\" npm run -w LibreChat frontend:ci",
   "outputDirectory": "client/dist",
   "rewrites": [
     {
@@ -19,18 +19,6 @@
     {
       "source": "/uploads/:path*",
       "destination": "https://librechat-production-dce3.up.railway.app/uploads/:path*"
-    },
-    {
-      "source": "/c/:path*",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/settings/:path*",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/auth/:path*",
-      "destination": "/index.html"
     },
     {
       "source": "/(.*)",

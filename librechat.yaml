@@ -16,5 +16,3 @@ endpoints:
   agents:
     disableBuilder: false
     capabilities: ["execute_code", "file_search", "actions", "tools", "artifacts", "ocr", "chain", "web_search"]
-    # Limit which providers agents can use
-    allowedProviders: ["openAI", "anthropic", "google", "xai", "deepseek"]

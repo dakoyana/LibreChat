@@ -7,12 +7,19 @@ fileStrategy: "firebase"
 
     Context-aware SCL agents. They are specialised to help push our projects forward. We develop new agents and kill the ones that suck.
 
-interface:
-  modelSelect: true
-  parameters: true  # <- lets users adjust reasoning/verbosity in UI
-
-# Configure agents to only use specific providers
 endpoints:
+  # Enable all capabilities for agents
   agents:
     disableBuilder: false
     capabilities: ["execute_code", "file_search", "actions", "tools", "artifacts", "ocr", "chain", "web_search"]
+  
+  # Add custom endpoints for additional providers
+  custom:
+    - name: "OpenRouter"
+      apiKey: "${OPENROUTER_KEY}"  # Or "user_provided" to let users enter their own
+      baseURL: "https://openrouter.ai/api/v1"
+      models:
+        fetch: true  # Fetches available models dynamically
+      titleConvo: true
+      titleModel: "current_model"
+

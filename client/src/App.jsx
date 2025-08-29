@@ -4,7 +4,13 @@ import { RouterProvider } from 'react-router-dom';
 import * as RadixToast from '@radix-ui/react-toast';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Toast, ThemeProvider, ToastProvider } from '@librechat/client';
+/**
+ * IMPORTANT:
+ * We avoid importing from '@librechat/client' to prevent Vite resolution errors
+ * on forks that don't include the workspace package. The shim below provides
+ * safe no-op fallbacks (ThemeProvider, ToastProvider, Toast).
+ */
+import { Toast, ThemeProvider, ToastProvider } from './libreClientShim';
 import { QueryClient, QueryClientProvider, QueryCache } from '@tanstack/react-query';
 import { ScreenshotProvider, useApiErrorBoundary } from './hooks';
 import { getThemeFromEnv } from './utils/getThemeFromEnv';
@@ -24,7 +30,6 @@ const App = () => {
     }),
   });
 
-  // Load theme from environment variables if available
   const envTheme = getThemeFromEnv();
 
   return (
@@ -32,15 +37,8 @@ const App = () => {
       <RecoilRoot>
         <LiveAnnouncer>
           <ThemeProvider
-            // Only pass initialTheme and themeRGB if environment theme exists
-            // This allows localStorage values to persist when no env theme is set
             {...(envTheme && { initialTheme: 'system', themeRGB: envTheme })}
           >
-            {/* The ThemeProvider will automatically:
-                1. Apply dark/light mode classes
-                2. Apply custom theme colors if envTheme is provided
-                3. Otherwise use stored theme preferences from localStorage
-                4. Fall back to default theme colors if nothing is stored */}
             <RadixToast.Provider>
               <ToastProvider>
                 <DndProvider backend={HTML5Backend}>
@@ -66,9 +64,7 @@ export default () => (
       allow="autoplay"
       id="audio"
       title="audio-silence"
-      style={{
-        display: 'none',
-      }}
+      style={{ display: 'none' }}
     />
   </ScreenshotProvider>
 );

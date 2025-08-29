@@ -37,5 +37,5 @@
       "destination": "/index.html"
     }
   ],
-  "ignoreCommand": "if [ \"$VERCEL_ENV\" = \"production\" ] && [ \"$VERCEL_GIT_COMMIT_REF\" != \"scl-ui\" ]; then echo \"Skipping prod build (not scl-ui)\"; exit 0; fi"
+  "ignoreCommand": "if [ \"$VERCEL_ENV\" = \"production\" ] && [ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ] && [ \"$VERCEL_GIT_COMMIT_REF\" != \"scl-ui\" ]; then echo \"Skipping prod build (branch must be main or scl-ui)\"; exit 0; fi"  
 }

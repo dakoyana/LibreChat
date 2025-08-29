@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,viewport-fit=cover"
+  />
+  <title>Agents — 3D Carousel</title>
+  <style>
+    html, body { height: 100%; margin: 0; background: #0b0d12; color: #e7e9ee; }
+    #wrap { position: fixed; inset: 0; }
+    canvas { display: block; width: 100%; height: 100%; }
+    #hud {
+      position: absolute; left: 50%; bottom: 6vh; transform: translateX(-50%);
+      max-width: min(80ch, 86vw); text-align: center; pointer-events: none;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+      line-height: 1.35;
+      filter: drop-shadow(0 2px 10px rgba(0,0,0,0.35));
+    }
+    #hud h1 { margin: 0 0 0.35rem; font-size: clamp(18px, 2.4vw, 28px); }
+    #hud p  { margin: 0 auto; opacity: 0.85; font-size: clamp(13px,1.6vw,16px); }
+    #notice {
+      position: absolute; top: 8px; right: 10px; opacity: 0.55; font-size: 12px;
+      user-select: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .animate { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="wrap">
+    <canvas id="c"></canvas>
+    <div id="hud" aria-live="polite" aria-atomic="true">
+      <h1 id="name">Loading Agents…</h1>
+      <p id="desc">Please wait.</p>
+    </div>
+    <div id="notice">← / → to rotate • Enter to select</div>
+  </div>
+
+  <!-- Pure-browser ESM import of Three; no NPM deps -->
+  <script type="module">
+    // Use a fixed, modern Three version
+    import * as THREE from 'https://unpkg.com/three@0.164.1/build/three.module.js';
+
+    const FALLBACK_AVATAR = '/assets/icon-192x192.png';
+    const state = {
+      agents: [],
+      meshes: [],
+      activeIndex: 0,
+      hovered: null,
+      destroyed: false
+    };
+
+    // DOM
+    const canvas = document.getElementById('c');
+    const hudName = document.getElementById('name');
+    const hudDesc = document.getElementById('desc');
+
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+
+    // Scene & camera
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0b0d12);
+
+    const camera = new THREE.PerspectiveCamera(38, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+    camera.position.set(0, 0.6, 6);
+
+    // Lights
+    const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+    scene.add(ambient);
+
+    const spot = new THREE.SpotLight(0xffffff, 1.6, 10, 1.05, 0.6, 2.0);
+    spot.position.set(0, 1.2, 2.8);
+    scene.add(spot);
+    const target = new THREE.Object3D();
+    scene.add(target);
+    spot.target = target;
+
+    // Ring group
+    const ring = new THREE.Group();
+    scene.add(ring);
+
+    // Interaction
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    function resize() {
+      if (!canvas) return;
+      const w = canvas.clientWidth || window.innerWidth;
+      const h = canvas.clientHeight || window.innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+
+    function mapAgent(a) {
+      // Try to be robust to different API shapes
+      return {
+        id: a.id || a._id || a.agent_id || a.uuid,
+        name: a.name || a.title || 'Untitled Agent',
+        description: a.description || a.summary || '',
+        avatarUrl: a.avatarUrl || a.avatar_url || a.iconUrl || a.icon_url || FALLBACK_AVATAR,
+      };
+    }
+
+    async function fetchAgents() {
+      const tries = [
+        '/api/agents?limit=200&visibility=public',
+        '/api/agents?limit=200',
+        '/api/agents/public?limit=200',
+      ];
+      for (const url of tries) {
+        try {
+          const r = await fetch(url, { credentials: 'include' });
+          if (!r.ok) continue;
+          const json = await r.json();
+          const list = Array.isArray(json) ? json : (json.data ?? json.results ?? json.items ?? []);
+          if (Array.isArray(list) && list.length) {
+            return list.map(mapAgent).filter(a => a.id);
+          }
+        } catch (_) {}
+      }
+      return [];
+    }
+
+    function makeAgentMesh(agent, i, count) {
+      const radius = 2.5;
+      const angle = (i / Math.max(1, count)) * Math.PI * 2;
+      const pos = new THREE.Vector3(Math.cos(angle) * radius, Math.sin(angle * 2) * 0.10, Math.sin(angle) * radius);
+
+      const geom = new THREE.CircleGeometry(0.5, 48);
+      const texLoader = new THREE.TextureLoader();
+      const tex = texLoader.load(agent.avatarUrl, undefined, undefined, () => {
+        // onError: fallback
+        texLoader.load(FALLBACK_AVATAR, t => { mat.map = t; mat.needsUpdate = true; });
+      });
+      const mat = new THREE.MeshStandardMaterial({
+        map: tex, metalness: 0.1, roughness: 0.85, transparent: true,
+      });
+
+      const mesh = new THREE.Mesh(geom, mat);
+      mesh.position.copy(pos);
+      mesh.userData.agent = agent;
+      mesh.userData.baseScale = 1;
+      mesh.frustumCulled = false; // we billboard & animate
+      return mesh;
+    }
+
+    function buildRing(agents) {
+      // Clear existing
+      for (const m of state.meshes) {
+        ring.remove(m);
+        m.geometry.dispose();
+        if (m.material.map) m.material.map.dispose();
+        m.material.dispose();
+      }
+      state.meshes.length = 0;
+
+      agents.forEach((a, i) => {
+        const mesh = makeAgentMesh(a, i, agents.length);
+        ring.add(mesh);
+        state.meshes.push(mesh);
+      });
+    }
+
+    function updateHUD(activeAgent) {
+      hudName.textContent = activeAgent?.name ?? 'Agents';
+      hudDesc.textContent = activeAgent?.description ?? '';
+    }
+
+    function setActiveIndex(newIdx) {
+      if (newIdx === state.activeIndex) return;
+      state.activeIndex = newIdx;
+      updateHUD(state.agents[newIdx]);
+    }
+
+    function animate(now = 0) {
+      if (state.destroyed) return;
+
+      // Gentle spin
+      ring.rotation.y += 0.015;
+
+      // Billboard & scale anim
+      const camPos = camera.position;
+      let best = state.activeIndex;
+      let bestZ = -Infinity;
+      for (const m of state.meshes) {
+        m.lookAt(camPos);
+        const targetScale = (state.hovered === m ? 1.18 : 1.0);
+        m.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.12);
+
+        // Compute "front-most" in camera space quickly
+        const mw = m.matrixWorld;
+        const z = -(mw.elements[8] * camPos.x + mw.elements[9] * camPos.y + mw.elements[10] * camPos.z + mw.elements[11]);
+        if (z > bestZ) { bestZ = z; best = state.meshes.indexOf(m); }
+      }
+
+      if (best !== state.activeIndex) {
+        setActiveIndex(best);
+
+        // Spotlight tracks the active
+        const targetMesh = state.meshes[best];
+        if (targetMesh) {
+          target.position.lerp(targetMesh.position.clone().applyMatrix4(ring.matrixWorld), 0.22);
+          const toCam = camera.position.clone().sub(target.position).normalize();
+          const desired = target.position.clone().add(toCam.multiplyScalar(1.6)).add(new THREE.Vector3(0, 0.3, 0));
+          spot.position.lerp(desired, 0.20);
+        }
+      }
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    function onPointerMove(e) {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(state.meshes, false);
+      const top = hits[0]?.object ?? null;
+      state.hovered = top;
+      canvas.style.cursor = top ? 'pointer' : 'default';
+    }
+
+    function selectAgent(agent) {
+      // Notify the parent React app to navigate
+      window.parent?.postMessage({ type: 'SCL_SELECT_AGENT', agentId: agent.id }, '*');
+    }
+
+    function onClick() {
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(state.meshes, false);
+      const top = hits[0]?.object ?? null;
+      const agent = top?.userData?.agent ?? state.agents[state.activeIndex];
+      if (agent) selectAgent(agent);
+    }
+
+    function onKey(e) {
+      if (!state.agents.length) return;
+      const step = (2 * Math.PI) / Math.max(1, state.agents.length);
+      if (e.key === 'ArrowRight') {
+        e.preventDefault(); ring.rotation.y -= step;
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault(); ring.rotation.y += step;
+      } else if (e.key === 'Enter') {
+        e.preventDefault(); const a = state.agents[state.activeIndex]; if (a) selectAgent(a);
+      }
+    }
+
+    canvas.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('click', onClick);
+    window.addEventListener('keydown', onKey);
+
+    // Bootstrap
+    (async () => {
+      try {
+        state.agents = await fetchAgents();
+      } catch (err) {
+        console.error('Failed to fetch agents', err);
+        state.agents = [];
+      }
+
+      if (!state.agents.length) {
+        hudName.textContent = 'No Agents Found';
+        hudDesc.textContent = 'Create or share Agents to populate the marketplace.';
+      }
+
+      buildRing(state.agents);
+      updateHUD(state.agents[0]);
+      animate();
+    })();
+
+    // Cleanup if parent unloads iframe
+    window.addEventListener('unload', () => {
+      state.destroyed = true;
+      window.removeEventListener('resize', resize);
+      canvas.removeEventListener('pointermove', onPointerMove);
+      canvas.removeEventListener('click', onClick);
+      window.removeEventListener('keydown', onKey);
+      renderer.dispose();
+    });
+  </script>
+</body>
+</html>

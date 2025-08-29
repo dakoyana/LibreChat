@@ -1,15 +1,41 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "cleanUrls": true,
+  "version": 2,
+  "installCommand": "npm ci --no-audit --prefer-offline",
+  "buildCommand": "NODE_OPTIONS=\"--max-old-space-size=2048\" npm run frontend:ci",
+  "outputDirectory": "client/dist",
   "rewrites": [
-    { "source": "/api/:path*",  "destination": "https://librechat-production-dce3.up.railway.app/api/:path*" },
-    { "source": "/auth/:path*", "destination": "https://librechat-production-dce3.up.railway.app/auth/:path*" },
-    { "source": "/((?!api|auth|assets|static|_next).*)", "destination": "/" }
-  ],
-  "headers": [
     {
       "source": "/api/:path*",
-      "headers": [{ "key": "Cache-Control", "value": "no-store" }]
+      "destination": "https://librechat-production-dce3.up.railway.app/api/:path*"
+    },
+    {
+      "source": "/socket.io/:path*",
+      "destination": "https://librechat-production-dce3.up.railway.app/socket.io/:path*"
+    },
+    {
+      "source": "/images/:path*",
+      "destination": "https://librechat-production-dce3.up.railway.app/images/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://librechat-production-dce3.up.railway.app/uploads/:path*"
+    },
+    {
+      "source": "/c/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/settings/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/auth/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  ]
+  ],
+  "ignoreCommand": "if [ \"$VERCEL_ENV\" = \"production\" ] && [ \"$VERCEL_GIT_COMMIT_REF\" != \"scl-ui\" ]; then echo \"Skipping prod build (not scl-ui)\"; exit 0; fi"
 }

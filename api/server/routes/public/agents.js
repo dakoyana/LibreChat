@@ -1,12 +1,16 @@
 const express = require('express');
 const router = express.Router();
 
-// Mongoose model (adjust path if your model lives elsewhere)
+// Try known model paths via module-alias (~ points to /api)
 let Agent;
 try {
-  Agent = require('../../models/Agent'); // from routes/public/* → ../../models/Agent
-} catch (e) {
-  console.error('[public/agents] Failed to load Agent model:', e);
+  Agent = require('~/models/Agent');
+} catch (e1) {
+  try {
+    Agent = require('~/models/agent');
+  } catch (e2) {
+    console.error('[public/agents] Failed to load Agent model from ~/models/{Agent|agent}', e2);
+  }
 }
 
 /** Strict whitelist of safe fields for public cards */
@@ -22,7 +26,7 @@ const sanitize = (a = {}) => ({
 });
 
 /** Predicate for “public/marketplace-visible” agents.
- * Tweak if your schema uses a different field.
+ * Adjust this to match your schema (e.g., { 'permissions.visibility': 'public' } or { isPublic: true }).
  */
 const publicPredicate = {
   $or: [
@@ -38,14 +42,18 @@ const publicPredicate = {
 // ---- Optional soft rate limiter (per-IP, 60 req / 60s) ----
 const hits = new Map();
 function rateLimit(req, res, next) {
-  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || 'unknown';
+  const ip =
+    req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+    req.socket.remoteAddress ||
+    'unknown';
   const now = Date.now();
   const windowMs = 60 * 1000;
   const max = 60;
 
   const entry = hits.get(ip) || { count: 0, ts: now };
   if (now - entry.ts > windowMs) {
-    entry.count = 0; entry.ts = now;
+    entry.count = 0;
+    entry.ts = now;
   }
   entry.count += 1;
   hits.set(ip, entry);
@@ -92,9 +100,16 @@ router.get('/', async (req, res, next) => {
     const predicate = and.length > 1 ? { $and: and } : and[0];
 
     const projection = {
-      name: 1, description: 1, shortDescription: 1,
-      avatarUrl: 1, avatar: 1, category: 1, tags: 1,
-      promoted: 1, featured: 1, updatedAt: 1,
+      name: 1,
+      description: 1,
+      shortDescription: 1,
+      avatarUrl: 1,
+      avatar: 1,
+      category: 1,
+      tags: 1,
+      promoted: 1,
+      featured: 1,
+      updatedAt: 1,
     };
 
     const rows = await Agent.find(predicate, projection)
@@ -127,7 +142,9 @@ router.get('/categories', async (req, res, next) => {
 
     const sorted = Array.from(set).sort();
     const payload = [
-      ...(hasPromoted ? [{ value: 'promoted', label: 'Top Picks', description: 'Recommended by SCL' }] : []),
+      ...(hasPromoted
+        ? [{ value: 'promoted', label: 'Top Picks', description: 'Recommended by SCL' }]
+        : []),
       { value: 'all', label: 'All', description: 'Browse all shared agents' },
       ...sorted.map((c) => ({ value: c, label: c })),
     ];

@@ -1,4 +1,3 @@
-// Core route modules
 const accessPermissions = require('./accessPermissions');
 const actions = require('./actions');
 const agents = require('./agents');
@@ -19,6 +18,7 @@ const models = require('./models');
 const oauth = require('./oauth');
 const plugins = require('./plugins');
 const presets = require('./presets');
+const prompts = require('./prompts');   // <-- restored
 const roles = require('./roles');
 const search = require('./search');
 const share = require('./share');
@@ -26,8 +26,9 @@ const staticRoute = require('./static');
 const tags = require('./tags');
 const tokenizer = require('./tokenizer');
 const user = require('./user');
+const memories = require('./memories'); // <-- restored
 
-// NEW 31-AUGUST-2025 BY DAKOYANA: public read-only namespace (expects ./public/index.js exporting an Express router)
+// NEW: public read-only namespace
 const publicRoutes = require('./public');
 
 module.exports = {
@@ -47,13 +48,13 @@ module.exports = {
   search,
   config,
   models,
-  prompts, // note: ensure ./prompts exists if used elsewhere
+  prompts,    // now defined
   plugins,
   actions,
   presets,
   balance,
   messages,
-  memories, // note: ensure ./memories exists if used elsewhere
+  memories,   // now defined
   endpoints,
   tokenizer,
   assistants,
@@ -61,6 +62,6 @@ module.exports = {
   staticRoute,
   accessPermissions,
 
-  // NEW: mounted at /public by whichever file consumes this map
+  // Mounted at /public in server index
   public: publicRoutes,
 };

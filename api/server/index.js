@@ -63,7 +63,7 @@ const startServer = async () => {
       : `${clientUrl.pathname}/`;
     if (baseHref !== '/') {
       logger.info(`Setting base href to ${baseHref}`);
-      indexHTML = indexHTML.replace(/base href="\/"/, `base href="${baseHref}"`);
+      indexHTML = indexHTML.replace(/base href="\//"/, `base href="${baseHref}"`);
     }
   }
 
@@ -74,7 +74,31 @@ const startServer = async () => {
   app.use(express.json({ limit: '3mb' }));
   app.use(express.urlencoded({ extended: true, limit: '3mb' }));
   app.use(mongoSanitize());
-  app.use(cors());
+
+  // ---- STRICT CORS (public endpoints consumed by igentic.space) ----
+  // Configure allowed origins via env: ALLOWED_ORIGINS=https://www.igentic.space[,https://<preview>.vercel.app]
+  const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  app.use(
+    cors({
+      origin: function (origin, cb) {
+        // Allow server-to-server/no-Origin requests (curl, health checks)
+        if (!origin) return cb(null, true);
+        const ok = allowedOrigins.length > 0 && allowedOrigins.includes(origin);
+        return cb(ok ? null : new Error('Not allowed by CORS'), ok);
+      },
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With', 'Origin'],
+      credentials: false,
+      optionsSuccessStatus: 204,
+      maxAge: 600,
+    })
+  );
+  // -----------------------------------------------------------------
+
   app.use(cookieParser());
 
   if (!isEnabled(DISABLE_COMPRESSION)) {
@@ -133,9 +157,12 @@ const startServer = async () => {
   app.use('/api/banner', routes.banner);
   app.use('/api/memories', routes.memories);
   app.use('/api/permissions', routes.accessPermissions);
-
   app.use('/api/tags', routes.tags);
   app.use('/api/mcp', routes.mcp);
+
+  // NEW: Public, read-only endpoints for Agents Space
+  // Expects api/server/routes/public/index.js exporting an Express router.
+  app.use('/api/public', routes.public);
 
   app.use(ErrorController);
 

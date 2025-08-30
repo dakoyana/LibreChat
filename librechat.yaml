@@ -2,10 +2,10 @@ version: 1.2.8
 cache: true
 fileStrategy: "firebase"
 
-  customWelcome: |
-    👋 Welcome to **SCL Agents Hub**, {{user.name}}!
+customWelcome: |
+    Welcome to **ChatSCL**, {{user.name}}!
 
-    Context-aware SCL agents. They are specialised to help push our projects forward. We develop new agents and kill the ones that suck.
+    Context-aware SCL agents. We develop new agents, let them evolve and kill the ones that suck.
 
 interface:
   modelSelect: true

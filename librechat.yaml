@@ -1,20 +1,55 @@
+# librechat.yaml
 version: 1.2.8
 cache: true
 fileStrategy: "firebase"
 
-  customWelcome: |
-    👋 Welcome to **SCL Agents Hub**, {{user.name}}!
-
-    Context-aware SCL agents. They are specialised to help push our projects forward. We develop new agents and kill the ones that suck.
+customWelcome: |
+  Welcome to **ChatSCL**, {{user.name}}!
+  Context-aware SCL agents. We develop new agents, let them evolve and kill the ones that suck.
 
 interface:
   modelSelect: true
-  parameters: true  # <- lets users adjust reasoning/verbosity in UI
+  parameters: true
 
-# Configure agents to only use specific providers
 endpoints:
   agents:
     disableBuilder: false
     capabilities: ["execute_code", "file_search", "actions", "tools", "artifacts", "ocr", "chain", "web_search"]
-    # Limit which providers agents can use
-    allowedProviders: ["openAI", "anthropic", "google", "xai", "deepseek"]
+    # Keep this as-is if you want to limit agents to these providers.
+    allowedProviders: ["openAI", "anthropic", "google", "xai", "deepseek", "OpenRouter", "together.ai"]
+
+  custom:
+    # --- OpenRouter ---
+    - name: "OpenRouter"
+      apiKey: "${OPENROUTER_KEY}"         # <— NOT OPENROUTER_API_KEY
+      baseURL: "https://openrouter.ai/api/v1"
+      models:
+        # These are just fallbacks in case fetch fails; the full list is fetched live.
+        default: ["meta-llama/llama-3-70b-instruct"]
+        fetch: true                       # <— OpenRouter supports live model fetch
+      dropParams: ["stop"]                # recommended for OpenRouter
+      titleConvo: true
+      # Use the current chat model for titles to avoid referencing a model you don't expose:
+      titleModel: "current_model"
+      modelDisplayLabel: "OpenRouter"
+
+    # --- together.ai ---
+    - name: "together.ai"
+      apiKey: "${TOGETHERAI_API_KEY}"
+      baseURL: "https://api.together.xyz"
+      models:
+        # together.ai does NOT support live model fetching in LibreChat.
+        # Provide a list you want to expose (see step 3 below to auto-generate).
+        default:
+          - "meta-llama/Meta-Llama-3-8B-Instruct"
+          - "meta-llama/Meta-Llama-3-70B-Instruct"
+          - "mistralai/Mixtral-8x7B-Instruct-v0.1"
+          - "mistralai/Mixtral-8x22B-Instruct-v0.1"
+          - "google/gemma-2-9b-it"
+          - "databricks/dbrx-instruct"
+          - "deepseek-ai/deepseek-coder-33b-instruct"
+          - "Qwen/Qwen2-72B-Instruct"
+        fetch: false                      # <— together.ai fetch is not supported
+      titleConvo: true
+      titleModel: "current_model"
+      modelDisplayLabel: "together.ai"

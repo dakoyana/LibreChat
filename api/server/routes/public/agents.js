@@ -26,7 +26,8 @@ const sanitize = (a = {}) => ({
 });
 
 /** Predicate for “public/marketplace-visible” agents.
- * Adjust this to match your schema (e.g., { 'permissions.visibility': 'public' } or { isPublic: true }).
+ * 🔧 TODO: after debugging, replace with your REAL visibility flag, e.g.:
+ *   const publicPredicate = { 'permissions.visibility': 'public' };
  */
 const publicPredicate = {
   $or: [
@@ -63,13 +64,47 @@ function rateLimit(req, res, next) {
   }
   return next();
 }
-router.use(rateLimit);
+// router.use(rateLimit);
 // -----------------------------------------------------------
+
+/* ============================
+   DEBUG ROUTES (temporary)
+   ============================ */
+
+// Is model present + quick sample (sanitized)
+router.get('/_debug', async (_req, res) => {
+  try {
+    if (!Agent) return res.status(500).json({ ok: false, error: 'Agent model not available' });
+    const count = await Agent.countDocuments({});
+    const one = await Agent.findOne({}, { _id: 1, name: 1, category: 1, updatedAt: 1 }).lean();
+    return res.json({ ok: true, count, sample: one ? sanitize(one) : null });
+  } catch (e) {
+    console.error('[public/agents/_debug] error:', e);
+    return res.status(500).json({ ok: false, error: 'debug_failed' });
+  }
+});
+
+// Show top-level keys of a sample doc (to find your real visibility field)
+router.get('/_schema', async (_req, res) => {
+  try {
+    if (!Agent) return res.status(500).json({ ok: false, error: 'Agent model not available' });
+    const one = await Agent.findOne({}).lean();
+    const keys = one ? Object.keys(one) : [];
+    return res.json({ ok: true, keys });
+  } catch (e) {
+    console.error('[public/agents/_schema] error:', e);
+    return res.status(500).json({ ok: false, error: 'schema_failed' });
+  }
+});
+
+/* ============================
+   REAL HANDLERS
+   ============================ */
 
 /** GET /api/public/agents
  *  Query: q, category, limit (<=200), offset
  */
-router.get('/', async (req, res, next) => {
+router.get('/', async (req, res) => {
   try {
     if (!Agent) return res.status(500).json({ error: 'Agent model not available' });
 
@@ -78,12 +113,15 @@ router.get('/', async (req, res, next) => {
     const limit = Math.min(parseInt(req.query.limit || '100', 10), 200);
     const offset = Math.max(parseInt(req.query.offset || '0', 10), 0);
 
-    const and = [publicPredicate];
+    // While validating, you can set PUBLIC_AGENTS_DEBUG_ALL=1 in Railway to bypass the predicate
+    const forceAll = process.env.PUBLIC_AGENTS_DEBUG_ALL === '1';
+
+    const and = [];
+    if (!forceAll) and.push(publicPredicate);
 
     if (category && category !== 'all' && category !== 'promoted') {
       and.push({ category });
-    }
-    if (category === 'promoted') {
+    } else if (category === 'promoted') {
       and.push({ $or: [{ promoted: true }, { featured: true }] });
     }
 
@@ -97,7 +135,7 @@ router.get('/', async (req, res, next) => {
       });
     }
 
-    const predicate = and.length > 1 ? { $and: and } : and[0];
+    const predicate = and.length ? { $and: and } : {};
 
     const projection = {
       name: 1,
@@ -119,19 +157,22 @@ router.get('/', async (req, res, next) => {
       .lean();
 
     res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
-    res.json(rows.map(sanitize));
+    return res.json(rows.map(sanitize));
   } catch (e) {
-    next(e);
+    console.error('[public/agents] GET / error:', e);
+    return res.status(500).json({ error: 'internal_error' });
   }
 });
 
 /** GET /api/public/agents/categories */
-router.get('/categories', async (req, res, next) => {
+router.get('/categories', async (_req, res) => {
   try {
     if (!Agent) return res.status(500).json({ error: 'Agent model not available' });
 
-    const projection = { category: 1, promoted: 1, featured: 1 };
-    const rows = await Agent.find(publicPredicate, projection).lean();
+    const forceAll = process.env.PUBLIC_AGENTS_DEBUG_ALL === '1';
+    const predicate = forceAll ? {} : publicPredicate;
+
+    const rows = await Agent.find(predicate, { category: 1, promoted: 1, featured: 1 }).lean();
 
     const set = new Set();
     let hasPromoted = false;
@@ -150,9 +191,10 @@ router.get('/categories', async (req, res, next) => {
     ];
 
     res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
-    res.json(payload);
+    return res.json(payload);
   } catch (e) {
-    next(e);
+    console.error('[public/agents] GET /categories error:', e);
+    return res.status(500).json({ error: 'internal_error' });
   }
 });
 

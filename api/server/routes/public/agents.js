@@ -1,44 +1,50 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 
-// Try known model paths via module-alias (~ points to /api)
-let Agent;
-try {
-  Agent = require('~/models/Agent');
-} catch (e1) {
-  try {
-    Agent = require('~/models/agent');
-  } catch (e2) {
-    console.error('[public/agents] Failed to load Agent model from ~/models/{Agent|agent}', e2);
-  }
+/* Helpers */
+function agentsCol() {
+  const db = mongoose.connection?.db;
+  return db ? db.collection('agents') : null;
 }
 
-/** Strict whitelist of safe fields for public cards */
+function aclCol() {
+  const db = mongoose.connection?.db;
+  return db ? db.collection('aclentries') : null;
+}
+
+function agentCategoriesCol() {
+  const db = mongoose.connection?.db;
+  return db ? db.collection('agentcategories') : null;
+}
+
+async function getPublicAgentIds() {
+  const col = aclCol();
+  if (!col) return [];
+
+  const entries = await col
+    .find(
+      { principalType: 'public', resourceType: 'agent', permBits: { $bitsAllSet: 1 } },
+      { projection: { resourceId: 1 } },
+    )
+    .toArray();
+
+  return entries.map((e) => e.resourceId);
+}
+
 const sanitize = (a = {}) => ({
   id: a._id?.toString?.() ?? a.id,
   name: a.name,
   description: a.description ?? a.shortDescription ?? '',
-  avatarUrl: a.avatarUrl ?? a.avatar ?? '',
+  avatarUrl:
+    typeof a.avatar === 'string'
+      ? a.avatar
+      : a.avatar?.filepath || a.avatarUrl || '',
   category: a.category ?? 'General',
   tags: Array.isArray(a.tags) ? a.tags : [],
-  promoted: Boolean(a.promoted || a.featured),
+  promoted: Boolean(a.is_promoted),
   updatedAt: a.updatedAt ?? null,
 });
-
-/** Predicate for “public/marketplace-visible” agents.
- * 🔧 TODO: after debugging, replace with your REAL visibility flag, e.g.:
- *   const publicPredicate = { 'permissions.visibility': 'public' };
- */
-const publicPredicate = {
-  $or: [
-    { 'permissions.visibility': 'public' },
-    { 'sharing.visibility': 'public' },
-    { 'marketplaceVisibility': 'public' },
-    { visibility: 'public' },
-    { isPublic: true },
-    { public: true },
-  ],
-};
 
 // ---- Optional soft rate limiter (per-IP, 60 req / 60s) ----
 const hits = new Map();
@@ -71,12 +77,15 @@ function rateLimit(req, res, next) {
    DEBUG ROUTES (temporary)
    ============================ */
 
-// Is model present + quick sample (sanitized)
 router.get('/_debug', async (_req, res) => {
   try {
-    if (!Agent) return res.status(500).json({ ok: false, error: 'Agent model not available' });
-    const count = await Agent.countDocuments({});
-    const one = await Agent.findOne({}, { _id: 1, name: 1, category: 1, updatedAt: 1 }).lean();
+    const col = agentsCol();
+    if (!col) return res.status(500).json({ ok: false, error: 'db_not_ready' });
+    const count = await col.countDocuments({});
+    const one = await col
+      .find({}, { projection: { _id: 1, name: 1, category: 1, updatedAt: 1, avatar: 1, avatarUrl: 1, is_promoted: 1 } })
+      .limit(1)
+      .next();
     return res.json({ ok: true, count, sample: one ? sanitize(one) : null });
   } catch (e) {
     console.error('[public/agents/_debug] error:', e);
@@ -84,11 +93,11 @@ router.get('/_debug', async (_req, res) => {
   }
 });
 
-// Show top-level keys of a sample doc (to find your real visibility field)
 router.get('/_schema', async (_req, res) => {
   try {
-    if (!Agent) return res.status(500).json({ ok: false, error: 'Agent model not available' });
-    const one = await Agent.findOne({}).lean();
+    const col = agentsCol();
+    if (!col) return res.status(500).json({ ok: false, error: 'db_not_ready' });
+    const one = await col.find({}, { projection: { _id: 0 } }).limit(1).next();
     const keys = one ? Object.keys(one) : [];
     return res.json({ ok: true, keys });
   } catch (e) {
@@ -101,30 +110,31 @@ router.get('/_schema', async (_req, res) => {
    REAL HANDLERS
    ============================ */
 
-/** GET /api/public/agents
- *  Query: q, category, limit (<=200), offset
- */
+// GET /api/public/agents
 router.get('/', async (req, res) => {
   try {
-    if (!Agent) return res.status(500).json({ error: 'Agent model not available' });
+    const col = agentsCol();
+    if (!col) return res.status(500).json({ error: 'db_not_ready' });
 
     const q = String(req.query.q || '').trim();
     const category = req.query.category ? String(req.query.category) : undefined;
     const limit = Math.min(parseInt(req.query.limit || '100', 10), 200);
     const offset = Math.max(parseInt(req.query.offset || '0', 10), 0);
 
-    // While validating, you can set PUBLIC_AGENTS_DEBUG_ALL=1 in Railway to bypass the predicate
     const forceAll = process.env.PUBLIC_AGENTS_DEBUG_ALL === '1';
-
-    const and = [];
-    if (!forceAll) and.push(publicPredicate);
-
-    if (category && category !== 'all' && category !== 'promoted') {
-      and.push({ category });
-    } else if (category === 'promoted') {
-      and.push({ $or: [{ promoted: true }, { featured: true }] });
+    let publicIds = [];
+    if (!forceAll) {
+      publicIds = await getPublicAgentIds();
+      if (publicIds.length === 0) {
+        res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
+        return res.json([]);
+      }
     }
 
+    const and = [];
+    if (!forceAll) and.push({ _id: { $in: publicIds } });
+    if (category && category !== 'all' && category !== 'promoted') and.push({ category });
+    if (category === 'promoted') and.push({ is_promoted: true });
     if (q) {
       and.push({
         $or: [
@@ -136,7 +146,6 @@ router.get('/', async (req, res) => {
     }
 
     const predicate = and.length ? { $and: and } : {};
-
     const projection = {
       name: 1,
       description: 1,
@@ -145,16 +154,16 @@ router.get('/', async (req, res) => {
       avatar: 1,
       category: 1,
       tags: 1,
-      promoted: 1,
-      featured: 1,
+      is_promoted: 1,
       updatedAt: 1,
     };
 
-    const rows = await Agent.find(predicate, projection)
+    const rows = await col
+      .find(predicate, { projection })
       .sort({ updatedAt: -1, _id: -1 })
       .skip(offset)
       .limit(limit)
-      .lean();
+      .toArray();
 
     res.set('Cache-Control', 'public, max-age=60, s-maxage=300');
     return res.json(rows.map(sanitize));
@@ -164,30 +173,52 @@ router.get('/', async (req, res) => {
   }
 });
 
-/** GET /api/public/agents/categories */
+// GET /api/public/agents/categories
 router.get('/categories', async (_req, res) => {
   try {
-    if (!Agent) return res.status(500).json({ error: 'Agent model not available' });
+    const col = agentsCol();
+    const categoriesCol = agentCategoriesCol();
+    if (!col || !categoriesCol) return res.status(500).json({ error: 'db_not_ready' });
 
     const forceAll = process.env.PUBLIC_AGENTS_DEBUG_ALL === '1';
-    const predicate = forceAll ? {} : publicPredicate;
+    let publicIds = [];
+    if (!forceAll) {
+      publicIds = await getPublicAgentIds();
+      if (publicIds.length === 0) {
+        res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+        return res.json([
+          { value: 'all', label: 'All', description: 'Browse all shared agents' },
+        ]);
+      }
+    }
 
-    const rows = await Agent.find(predicate, { category: 1, promoted: 1, featured: 1 }).lean();
+    const predicate = forceAll ? {} : { _id: { $in: publicIds } };
+    const rows = await col
+      .find(predicate, { projection: { category: 1, is_promoted: 1 } })
+      .toArray();
 
     const set = new Set();
     let hasPromoted = false;
     for (const a of rows) {
       if (a?.category) set.add(String(a.category));
-      if (a?.promoted || a?.featured) hasPromoted = true;
+      if (a?.is_promoted) hasPromoted = true;
     }
 
-    const sorted = Array.from(set).sort();
+    const categories = set.size
+      ? await categoriesCol
+          .find(
+            { value: { $in: Array.from(set) } },
+            { projection: { value: 1, label: 1, description: 1 }, sort: { order: 1 } },
+          )
+          .toArray()
+      : [];
+
     const payload = [
       ...(hasPromoted
         ? [{ value: 'promoted', label: 'Top Picks', description: 'Recommended by SCL' }]
         : []),
       { value: 'all', label: 'All', description: 'Browse all shared agents' },
-      ...sorted.map((c) => ({ value: c, label: c })),
+      ...categories.map((c) => ({ value: c.value, label: c.label, description: c.description })),
     ];
 
     res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
@@ -199,3 +230,4 @@ router.get('/categories', async (_req, res) => {
 });
 
 module.exports = router;
+
